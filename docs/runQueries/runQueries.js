@@ -83,9 +83,6 @@ async function loadQueryResult() {
       divContainer.appendChild(table);
     }
   });
-  // await p4vjs.p4('streams //PUBG/...').then((result2) => {
-  //   console.log('p4 streams result:', result2);
-  // });
 }
 
 function setQuery(selectedValue) {
