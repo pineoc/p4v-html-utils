@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Run Queries</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+    />
+    <link rel="stylesheet" href="/css/style.css"/>
+    <script src="/libs/p4vjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="./runQueries.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    
+  </head>
+  <!-- call getMatrix function On body onload event to get result -->
+  <body>
+    <section class="section">
+      <div class="box">
+        <div class="field">
+         <div class="control is-expanded">
+            <input type="text" class="input" id="querytext" name="querytext" />
+          </div>
+        </div>
+        <div class="field has-addons">
+         <div class="control">
+            <input type="text" class="input" id="searchText" placeholder="Description search" />
+          </div>
+          <div class="control">
+            <button class="button is-info" id="excuteBtn">Search</button>
+          </div>
+        </div>
+      </div>
+      <div id="queryResultContainer" class="box">
+        <p>No Items retrieved</p>
+      </div>
+    </section>
+    
+  </body>
+</html>
