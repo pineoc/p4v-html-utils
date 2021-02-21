@@ -30,13 +30,13 @@ async function loadQueryResult() {
 
     if (nrOfRows > 0) {
       // Create dynamic table.
-      var table = document.createElement('table');
+      let table = document.createElement('table');
       table.classList.add('table', 'is-fullwidth');
 
       // Retrieve column header 
-      var col = []; // define an empty array
-      for (var i = 0; i < nrOfRows; i++) {
-        for (var key in queryResultContainer[i]) {
+      let col = []; // define an empty array
+      for (let i = 0; i < nrOfRows; i++) {
+        for (let key in queryResultContainer[i]) {
           if (col.indexOf(key) === -1) {
             col.push(key);
           }
@@ -44,13 +44,13 @@ async function loadQueryResult() {
       }
 
       // Create table head 
-      var tHead = document.createElement('thead');
+      let tHead = document.createElement('thead');
 
       // Create row for table head
-      var hRow = document.createElement('tr');
+      let hRow = document.createElement('tr');
 
       // Add column header to row of table head
-      for (var i = 0; i < col.length; i++) {
+      for (let i = 0; i < col.length; i++) {
         var th = document.createElement('th');
         th.innerHTML = col[i];
         hRow.appendChild(th);
@@ -62,12 +62,12 @@ async function loadQueryResult() {
       var tBody = document.createElement('tbody');
 
       // Add column header to row of table head
-      for (var i = 0; i < nrOfRows; i++) {
+      for (let i = 0; i < nrOfRows; i++) {
         if (isIncludeSearchString(queryResultContainer[i].Description) === false)
           continue;        
         var bRow = document.createElement('tr'); // Create row for each item 
 
-        for (var j = 0; j < col.length; j++) {
+        for (let j = 0; j < col.length; j++) {
           var td = document.createElement('td');
           td.innerHTML = queryResultContainer[i][col[j]];
           bRow.appendChild(td);
@@ -78,14 +78,15 @@ async function loadQueryResult() {
       table.appendChild(tBody);
 
       // Finally add the newly created table with json data to a container
-      var divContainer = document.getElementById('queryResultContainer');
+      let divContainer = document.getElementById('queryResultContainer');
       divContainer.innerHTML = '';
       divContainer.appendChild(table);
+    } else {
+      // Finally add the newly created table with json data to a container
+      let divContainer = document.getElementById('queryResultContainer');
+      divContainer.innerHTML = 'No Items retrieved';
     }
   });
-  // await p4vjs.p4('streams //PUBG/...').then((result2) => {
-  //   console.log('p4 streams result:', result2);
-  // });
 }
 
 function setQuery(selectedValue) {
