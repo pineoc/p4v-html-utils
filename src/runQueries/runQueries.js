@@ -9,6 +9,12 @@ async function runOnload() {
   setQuery(p4query);
 
   document.getElementById('excuteBtn').addEventListener('click', executeQuery, false);
+  document.getElementById('searchText').addEventListener('keyup', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      executeQuery();
+    }
+  });
 
   loadQueryResult();
 }

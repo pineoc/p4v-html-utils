@@ -1,4 +1,4 @@
-﻿/**
+/**
  * submitMain(): Initializes the submit dialog 
 **/
 function submitMain() {

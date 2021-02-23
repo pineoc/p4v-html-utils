@@ -8,7 +8,7 @@ var src = {
 };
 
 var dst = {
-    css: "docs/css/",
+    css: "docs/",
     html: "docs/",
     js: "docs/",
 };
