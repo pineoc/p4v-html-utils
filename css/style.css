@@ -1,0 +1,21 @@
+table {
+    /* table-layout: fixed; */
+}
+table td {
+    word-break: break-word;
+}
+table td:first-child {
+    width: 30px;
+}
+/* date */
+table td:nth-child(2) {
+    width: 120px;
+}
+/* user */
+table td:last-child {
+    width: 120px;
+}
+
+table td:nth-child(3) {
+    width: calc(100% - 270px);
+}
