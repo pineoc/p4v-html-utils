@@ -15,6 +15,11 @@ async function runOnload() {
       executeQuery();
     }
   });
+  // set jira url
+  document.getElementById('saveBtn').addEventListener('click', setJiraUrl, false);
+  if (getJiraUrl()) {
+    document.getElementById('url').value = localStorage.getItem('jiraUrl');
+  }
 
   loadQueryResult();
 }
@@ -32,7 +37,6 @@ async function loadQueryResult() {
       return e;
     });
     var nrOfRows = queryResultContainer.length;
-    console.log(queryResultContainer);
 
     if (nrOfRows > 0) {
       // Create dynamic table.
@@ -70,7 +74,13 @@ async function loadQueryResult() {
       // Add column header to row of table head
       for (let i = 0; i < nrOfRows; i++) {
         if (isIncludeSearchString(queryResultContainer[i].Description) === false)
-          continue;        
+          continue;
+        // auto link
+        queryResultContainer[i].Description = Autolinker.link(queryResultContainer[i].Description);
+        // if jiraUrl setup, replace jira key to jira link text
+        if (getJiraUrl()) {
+          queryResultContainer[i].Description = parseJiraKeyToLink(queryResultContainer[i].Description);
+        }
         var bRow = document.createElement('tr'); // Create row for each item 
 
         for (let j = 0; j < col.length; j++) {
@@ -78,6 +88,7 @@ async function loadQueryResult() {
           td.innerHTML = queryResultContainer[i][col[j]];
           bRow.appendChild(td);
         }
+        
         tBody.appendChild(bRow);
 
       }
@@ -113,6 +124,32 @@ function executeQuery() {
 function isIncludeSearchString(desc) {
   var searchString = document.getElementById('searchText').value;
   return desc.indexOf(searchString) !== -1;
+}
+
+function setJiraUrl() {
+  var urlfield = document.getElementById('url').value;
+  window.localStorage.setItem('jiraUrl', urlfield);
+}
+function getJiraUrl() {
+  return window.localStorage.getItem('jiraUrl');
+}
+function getHrefElement(url, text) {
+  return '<a href="'+url+'">'+text+'</a>';
+}
+function parseJiraKeyToLink(desc) {
+  // Ref: https://community.atlassian.com/t5/Bitbucket-questions/Regex-pattern-to-match-JIRA-issue-key/qaq-p/233319
+  const jiraMatcher = /((?!([A-Z0-9a-z]{1,10})-?$)[A-Z]{1}[A-Z0-9]+-\d+)/g;
+  // const jiraMatcher = /((?<!([A-Za-z]{1,10})-?)[A-Z]+-\d+)/g;
+  let keys = desc.toUpperCase().match(jiraMatcher);
+  // jira key matched
+  keys = [...new Set(keys)]; // remove dups
+  if (keys != null && keys.length > 0) {
+    // jira ticket string in text
+    for(var i = 0; i < keys.length; i++) {
+      desc = desc.replace(keys[i], getHrefElement(getJiraUrl()+'/browse/'+keys[i], keys[i]));
+    }
+  }
+  return desc;
 }
 
 // set Event listener to objects
