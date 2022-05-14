@@ -1,6 +1,7 @@
 /// <binding AfterBuild="build" />
 var gulp = require("gulp");
 var ghPages = require('gulp-gh-pages');
+var del = require('del');
 
 var src = {
   css: ["src/**/*.css"],
@@ -14,6 +15,9 @@ var dst = {
   js: "docs/",
 };
 
+gulp.task("clean", function () {
+  return del(['docs']);
+})
 gulp.task("build:html", function () {
   return gulp.src(src.html).pipe(gulp.dest(dst.html));
 });
@@ -23,7 +27,7 @@ gulp.task("build:js", function () {
 gulp.task("build:css", function () {
   return gulp.src(src.css).pipe(gulp.dest(dst.css));
 });
-gulp.task("build", gulp.series("build:css", "build:js", "build:html"));
+gulp.task("build", gulp.series("clean", "build:css", "build:js", "build:html"));
 
 gulp.task("deploy", function () {
   const option = {

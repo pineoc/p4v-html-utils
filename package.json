@@ -23,5 +23,8 @@
   "devDependencies": {
     "gulp": "^4.0.2",
     "gulp-gh-pages": "^0.5.4"
+  },
+  "dependencies": {
+    "del": "^6.0.0"
   }
 }
