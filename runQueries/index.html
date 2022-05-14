@@ -12,6 +12,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="./runQueries.js"></script>
+    <script src="../libs/Autolinker.min.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
@@ -40,6 +41,14 @@
             <input type="submit" class="button is-info" id="excuteBtn" value="Search">
           </div>
         </div>
+        <div class="field has-addons">
+          <div class="control">
+             <input type="text" class="input" id="url" placeholder="Jira URL" />
+           </div>
+           <div class="control">
+             <input type="submit" class="button is-info" id="saveBtn" value="Save">
+           </div>
+         </div>
       </div>
       <div id="queryResultContainer" class="box">
         <p>No Items retrieved</p>
