@@ -15,6 +15,12 @@ async function runOnload() {
       executeQuery();
     }
   });
+  document.getElementById('querytext').addEventListener('keyup', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      executeQuery();
+    }
+  });
   // set jira url
   document.getElementById('saveBtn').addEventListener('click', setJiraUrl, false);
   if (getJiraUrl()) {
@@ -52,7 +58,6 @@ async function loadQueryResult() {
           }
         }
       }
-
       // Create table head 
       let tHead = document.createElement('thead');
 
@@ -75,12 +80,14 @@ async function loadQueryResult() {
       for (let i = 0; i < nrOfRows; i++) {
         if (isIncludeSearchString(queryResultContainer[i].Description) === false)
           continue;
-        // auto link
-        queryResultContainer[i].Description = Autolinker.link(queryResultContainer[i].Description);
+        
         // if jiraUrl setup, replace jira key to jira link text
         if (getJiraUrl()) {
           queryResultContainer[i].Description = parseJiraKeyToLink(queryResultContainer[i].Description);
         }
+        // auto link
+        queryResultContainer[i].Description = Autolinker.link(queryResultContainer[i].Description, {newWindow: true});
+
         var bRow = document.createElement('tr'); // Create row for each item 
 
         for (let j = 0; j < col.length; j++) {
@@ -112,7 +119,6 @@ function setQuery(selectedValue) {
   qvalue = qvalue.replace('$curr_user', p4user);
   qvalue = qvalue.replace('$curr_workspace', p4workspace);
   inputfield.value = qvalue;
-  console.log(qvalue);
 }
 
 function executeQuery() {
@@ -134,7 +140,7 @@ function getJiraUrl() {
   return window.localStorage.getItem('jiraUrl');
 }
 function getHrefElement(url, text) {
-  return '<a href="'+url+'">'+text+'</a>';
+  return '<a href="'+url+'" target="_blank">'+text+'</a>';
 }
 function parseJiraKeyToLink(desc) {
   // Ref: https://community.atlassian.com/t5/Bitbucket-questions/Regex-pattern-to-match-JIRA-issue-key/qaq-p/233319
