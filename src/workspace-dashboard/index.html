@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Workspace Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./dashboard.js"></script>
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title">Workspace Dashboard</h1>
+        <div class="columns is-multiline">
+          <div class="column is-6">
+            <div class="box">
+              <h2 class="subtitle">Open Files</h2>
+              <div id="openFiles">Loading...</div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="box">
+              <h2 class="subtitle">Workspace Usage</h2>
+              <canvas id="workspaceChart"></canvas>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="box">
+              <h2 class="subtitle">Latest Build</h2>
+              <div class="field has-addons">
+                <div class="control is-expanded">
+                  <input type="text" class="input" id="jenkinsUrl" placeholder="Jenkins API URL" />
+                </div>
+                <div class="control">
+                  <input type="submit" class="button is-info" id="saveJenkinsUrl" value="Save" />
+                </div>
+              </div>
+              <div id="buildStatus">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
