@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Asset Dependencies</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+    />
+    <script src="./deps.js"></script>
+  </head>
+  <body>
+    <section class="section">
+      <div class="box">
+        <h2 class="title is-4">Selected Asset</h2>
+        <p id="filePath"></p>
+        <pre id="metadata"></pre>
+      </div>
+      <div class="box">
+        <h2 class="title is-5">Dependencies</h2>
+        <div id="depsContainer">No data</div>
+      </div>
+    </section>
+  </body>
+</html>
