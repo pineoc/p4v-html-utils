@@ -31,3 +31,7 @@ Additional updates are planned.
 ### Run Query (Changelist Search)
 
 Simple changelist search feature
+
+### Asset Dependencies
+
+Displays metadata and recursive dependencies for a selected asset using Unreal's AssetRegistry.
