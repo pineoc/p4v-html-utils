@@ -15,11 +15,15 @@ async function runOnload() {
       executeQuery();
     }
   });
-  // set jira url
-  document.getElementById('saveBtn').addEventListener('click', setJiraUrl, false);
-  if (getJiraUrl()) {
-    document.getElementById('url').value = localStorage.getItem('jiraUrl');
-  }
+  document.getElementById('querytext').addEventListener('keyup', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      executeQuery();
+    }
+  });
+  // set jira options
+  document.getElementById('saveBtn').addEventListener('click', setJiraConfig, false);
+  await initializeJiraConfig();
 
   loadQueryResult();
 }
@@ -43,7 +47,7 @@ async function loadQueryResult() {
       let table = document.createElement('table');
       table.classList.add('table', 'is-fullwidth');
 
-      // Retrieve column header 
+      // Retrieve column header
       let col = []; // define an empty array
       for (let i = 0; i < nrOfRows; i++) {
         for (let key in queryResultContainer[i]) {
@@ -52,8 +56,7 @@ async function loadQueryResult() {
           }
         }
       }
-
-      // Create table head 
+      // Create table head
       let tHead = document.createElement('thead');
 
       // Create row for table head
@@ -68,27 +71,29 @@ async function loadQueryResult() {
       tHead.appendChild(hRow);
       table.appendChild(tHead);
 
-      // Create table body 
+      // Create table body
       var tBody = document.createElement('tbody');
 
       // Add column header to row of table head
       for (let i = 0; i < nrOfRows; i++) {
         if (isIncludeSearchString(queryResultContainer[i].Description) === false)
           continue;
-        // auto link
-        queryResultContainer[i].Description = Autolinker.link(queryResultContainer[i].Description);
+
         // if jiraUrl setup, replace jira key to jira link text
         if (getJiraUrl()) {
           queryResultContainer[i].Description = parseJiraKeyToLink(queryResultContainer[i].Description);
         }
-        var bRow = document.createElement('tr'); // Create row for each item 
+        // auto link
+        queryResultContainer[i].Description = Autolinker.link(queryResultContainer[i].Description, {newWindow: true});
+
+        var bRow = document.createElement('tr'); // Create row for each item
 
         for (let j = 0; j < col.length; j++) {
           var td = document.createElement('td');
           td.innerHTML = queryResultContainer[i][col[j]];
           bRow.appendChild(td);
         }
-        
+
         tBody.appendChild(bRow);
 
       }
@@ -98,6 +103,9 @@ async function loadQueryResult() {
       let divContainer = document.getElementById('queryResultContainer');
       divContainer.innerHTML = '';
       divContainer.appendChild(table);
+      if (getJiraUrl()) {
+        enhanceJiraLinks();
+      }
     } else {
       // Finally add the newly created table with json data to a container
       let divContainer = document.getElementById('queryResultContainer');
@@ -112,7 +120,6 @@ function setQuery(selectedValue) {
   qvalue = qvalue.replace('$curr_user', p4user);
   qvalue = qvalue.replace('$curr_workspace', p4workspace);
   inputfield.value = qvalue;
-  console.log(qvalue);
 }
 
 function executeQuery() {
@@ -126,15 +133,20 @@ function isIncludeSearchString(desc) {
   return desc.indexOf(searchString) !== -1;
 }
 
-function setJiraUrl() {
+function setJiraConfig() {
   var urlfield = document.getElementById('url').value;
+  var tokenfield = document.getElementById('token').value;
   window.localStorage.setItem('jiraUrl', urlfield);
+  window.localStorage.setItem('jiraToken', tokenfield);
 }
 function getJiraUrl() {
   return window.localStorage.getItem('jiraUrl');
 }
+function getJiraToken() {
+  return window.localStorage.getItem('jiraToken');
+}
 function getHrefElement(url, text) {
-  return '<a href="'+url+'">'+text+'</a>';
+  return '<a href="'+url+'" target="_blank" class="jira-link" data-key="'+text+'">'+text+'</a>';
 }
 function parseJiraKeyToLink(desc) {
   // Ref: https://community.atlassian.com/t5/Bitbucket-questions/Regex-pattern-to-match-JIRA-issue-key/qaq-p/233319
@@ -152,5 +164,74 @@ function parseJiraKeyToLink(desc) {
   return desc;
 }
 
+async function fetchJiraIssue(key) {
+  const baseUrl = getJiraUrl();
+  if (!baseUrl) return null;
+  const headers = {};
+  if (getJiraToken()) {
+    headers['Authorization'] = 'Basic ' + getJiraToken();
+  }
+  try {
+    const response = await fetch(baseUrl + '/rest/api/2/issue/' + key, {headers});
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return await response.json();
+  } catch (e) {
+    console.error('Failed to fetch JIRA issue', e);
+    return null;
+  }
+}
+
+async function enhanceJiraLinks() {
+  const links = document.querySelectorAll('a.jira-link');
+  for (const link of links) {
+    const key = link.getAttribute('data-key');
+    const issue = await fetchJiraIssue(key);
+    if (issue && issue.fields) {
+      const info = document.createElement('span');
+      info.className = 'jira-info';
+      info.textContent = ' - ' + issue.fields.summary + ' [' + issue.fields.status.name + ']';
+      link.parentNode.insertBefore(info, link.nextSibling);
+    }
+  }
+}
+
+async function getEnvVar(name) {
+  try {
+    const result = await p4vjs.p4('set -q ' + name);
+    if (result && result.data && result.data.length > 0) {
+      const line = result.data[0];
+      const idx = line.indexOf('=');
+      if (idx !== -1) {
+        return line.substring(idx + 1).trim();
+      }
+    }
+  } catch (e) {
+    console.error('Failed to get env var', name, e);
+  }
+  return null;
+}
+
+async function initializeJiraConfig() {
+  if (!getJiraUrl()) {
+    const envUrl = await getEnvVar('JIRA_URL');
+    if (envUrl) {
+      window.localStorage.setItem('jiraUrl', envUrl);
+    }
+  }
+  if (!getJiraToken()) {
+    const envToken = await getEnvVar('JIRA_TOKEN');
+    if (envToken) {
+      window.localStorage.setItem('jiraToken', envToken);
+    }
+  }
+  if (getJiraUrl()) {
+    document.getElementById('url').value = getJiraUrl();
+  }
+  if (getJiraToken()) {
+    document.getElementById('token').value = getJiraToken();
+  }
+}
+
 // set Event listener to objects
 window.addEventListener('load', runOnload, false);
+
