@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/pineoc/p4v-html-utils#readme",
   "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-gh-pages": "^0.5.4"
+    "gh-pages": "^6.3.0",
+    "gulp": "^5.0.1"
   },
   "dependencies": {
     "del": "^6.0.0"
