@@ -21,11 +21,9 @@ async function runOnload() {
       executeQuery();
     }
   });
-  // set jira url
-  document.getElementById('saveBtn').addEventListener('click', setJiraUrl, false);
-  if (getJiraUrl()) {
-    document.getElementById('url').value = localStorage.getItem('jiraUrl');
-  }
+  // set jira options
+  document.getElementById('saveBtn').addEventListener('click', setJiraConfig, false);
+  await initializeJiraConfig();
 
   loadQueryResult();
 }
@@ -105,6 +103,9 @@ async function loadQueryResult() {
       let divContainer = document.getElementById('queryResultContainer');
       divContainer.innerHTML = '';
       divContainer.appendChild(table);
+      if (getJiraUrl()) {
+        enhanceJiraLinks();
+      }
     } else {
       // Finally add the newly created table with json data to a container
       let divContainer = document.getElementById('queryResultContainer');
@@ -132,15 +133,20 @@ function isIncludeSearchString(desc) {
   return desc.indexOf(searchString) !== -1;
 }
 
-function setJiraUrl() {
+function setJiraConfig() {
   var urlfield = document.getElementById('url').value;
+  var tokenfield = document.getElementById('token').value;
   window.localStorage.setItem('jiraUrl', urlfield);
+  window.localStorage.setItem('jiraToken', tokenfield);
 }
 function getJiraUrl() {
   return window.localStorage.getItem('jiraUrl');
 }
+function getJiraToken() {
+  return window.localStorage.getItem('jiraToken');
+}
 function getHrefElement(url, text) {
-  return '<a href="'+url+'" target="_blank">'+text+'</a>';
+  return '<a href="'+url+'" target="_blank" class="jira-link" data-key="'+text+'">'+text+'</a>';
 }
 function parseJiraKeyToLink(desc) {
   // Ref: https://community.atlassian.com/t5/Bitbucket-questions/Regex-pattern-to-match-JIRA-issue-key/qaq-p/233319
@@ -156,6 +162,74 @@ function parseJiraKeyToLink(desc) {
     }
   }
   return desc;
+}
+
+async function fetchJiraIssue(key) {
+  const baseUrl = getJiraUrl();
+  if (!baseUrl) return null;
+  const headers = {};
+  if (getJiraToken()) {
+    headers['Authorization'] = 'Basic ' + getJiraToken();
+  }
+  try {
+    const response = await fetch(baseUrl + '/rest/api/2/issue/' + key, {headers});
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return await response.json();
+  } catch (e) {
+    console.error('Failed to fetch JIRA issue', e);
+    return null;
+  }
+}
+
+async function enhanceJiraLinks() {
+  const links = document.querySelectorAll('a.jira-link');
+  for (const link of links) {
+    const key = link.getAttribute('data-key');
+    const issue = await fetchJiraIssue(key);
+    if (issue && issue.fields) {
+      const info = document.createElement('span');
+      info.className = 'jira-info';
+      info.textContent = ' - ' + issue.fields.summary + ' [' + issue.fields.status.name + ']';
+      link.parentNode.insertBefore(info, link.nextSibling);
+    }
+  }
+}
+
+async function getEnvVar(name) {
+  try {
+    const result = await p4vjs.p4('set -q ' + name);
+    if (result && result.data && result.data.length > 0) {
+      const line = result.data[0];
+      const idx = line.indexOf('=');
+      if (idx !== -1) {
+        return line.substring(idx + 1).trim();
+      }
+    }
+  } catch (e) {
+    console.error('Failed to get env var', name, e);
+  }
+  return null;
+}
+
+async function initializeJiraConfig() {
+  if (!getJiraUrl()) {
+    const envUrl = await getEnvVar('JIRA_URL');
+    if (envUrl) {
+      window.localStorage.setItem('jiraUrl', envUrl);
+    }
+  }
+  if (!getJiraToken()) {
+    const envToken = await getEnvVar('JIRA_TOKEN');
+    if (envToken) {
+      window.localStorage.setItem('jiraToken', envToken);
+    }
+  }
+  if (getJiraUrl()) {
+    document.getElementById('url').value = getJiraUrl();
+  }
+  if (getJiraToken()) {
+    document.getElementById('token').value = getJiraToken();
+  }
 }
 
 // set Event listener to objects
