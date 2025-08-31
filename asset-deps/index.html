@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,15 +13,14 @@
   </head>
   <body>
     <section class="section">
+      <!-- 선택한 파일 리스트 -->
       <div class="box">
-        <h2 class="title is-4">Selected Asset</h2>
-        <p id="filePath"></p>
-        <pre id="metadata"></pre>
+        <h2 class="title is-4">Selected Files</h2>
+        <div id="selectedBox">No selection</div>
       </div>
-      <div class="box">
-        <h2 class="title is-5">Dependencies</h2>
-        <div id="depsContainer">No data</div>
-      </div>
+
+      <!-- 파일별 메타/디펜던시 카드가 여기에 동적 생성 -->
+      <div id="depsRoot"></div>
     </section>
   </body>
 </html>
