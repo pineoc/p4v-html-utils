@@ -47,7 +47,7 @@ async function loadQueryResult() {
       let table = document.createElement('table');
       table.classList.add('table', 'is-fullwidth');
 
-      // Retrieve column header
+      // Retrieve column header 
       let col = []; // define an empty array
       for (let i = 0; i < nrOfRows; i++) {
         for (let key in queryResultContainer[i]) {
@@ -56,7 +56,7 @@ async function loadQueryResult() {
           }
         }
       }
-      // Create table head
+      // Create table head 
       let tHead = document.createElement('thead');
 
       // Create row for table head
@@ -71,14 +71,14 @@ async function loadQueryResult() {
       tHead.appendChild(hRow);
       table.appendChild(tHead);
 
-      // Create table body
+      // Create table body 
       var tBody = document.createElement('tbody');
 
       // Add column header to row of table head
       for (let i = 0; i < nrOfRows; i++) {
         if (isIncludeSearchString(queryResultContainer[i].Description) === false)
           continue;
-
+        
         // if jiraUrl setup, replace jira key to jira link text
         if (getJiraUrl()) {
           queryResultContainer[i].Description = parseJiraKeyToLink(queryResultContainer[i].Description);
@@ -86,14 +86,14 @@ async function loadQueryResult() {
         // auto link
         queryResultContainer[i].Description = Autolinker.link(queryResultContainer[i].Description, {newWindow: true});
 
-        var bRow = document.createElement('tr'); // Create row for each item
+        var bRow = document.createElement('tr'); // Create row for each item 
 
         for (let j = 0; j < col.length; j++) {
           var td = document.createElement('td');
           td.innerHTML = queryResultContainer[i][col[j]];
           bRow.appendChild(td);
         }
-
+        
         tBody.appendChild(bRow);
 
       }
@@ -234,4 +234,3 @@ async function initializeJiraConfig() {
 
 // set Event listener to objects
 window.addEventListener('load', runOnload, false);
-
